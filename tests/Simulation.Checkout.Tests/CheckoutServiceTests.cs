@@ -30,7 +30,7 @@ public class CheckoutServiceTests
             _notificationServiceMock.Object);
     }
 
-    #region Task 1: Business Rules
+    // ── Validation & Business Rules ──
 
     [Fact]
     public async Task CheckoutAsync_WhenOrderHasNoItems_ShouldThrowEmptyOrderException()
@@ -115,7 +115,7 @@ public class CheckoutServiceTests
     [Fact]
     public async Task CheckoutAsync_WhenGivenExampleA_ShouldCalculateCorrectSubtotalDiscountAndTotal()
     {
-        // Arrange: 2 * 150 + 1 * 400 = 700 (Discount: 0, Total: 700)
+        // Arrange — 2×150 + 1×400 = 700
         var item1 = CreateItem("Item A1", unitPrice: 150m, quantity: 2);
         var item2 = CreateItem("Item A2", unitPrice: 400m, quantity: 1);
         var order = CreateOrderWithItems(item1, item2);
@@ -132,7 +132,7 @@ public class CheckoutServiceTests
     [Fact]
     public async Task CheckoutAsync_WhenGivenExampleC_ShouldCalculateCorrectSubtotalDiscountAndTotal()
     {
-        // Arrange: 3 * 500 = 1,500 (Discount: 100, Total: 1,400)
+        // Arrange — 3×500 = 1500
         var item = CreateItem("Item C", unitPrice: 500m, quantity: 3);
         var order = CreateOrderWithItems(item);
 
@@ -145,9 +145,7 @@ public class CheckoutServiceTests
         result.Total.Should().Be(1400m);
     }
 
-    #endregion
-
-    #region Task 2: Mocks (Moq)
+    // ── Mocking & Interaction Verification ──
 
     [Fact]
     public async Task CheckoutAsync_WhenOrderIsValidAndAllItemsInStock_ShouldSaveOrderAndSendConfirmationOnce()
@@ -189,7 +187,7 @@ public class CheckoutServiceTests
     [Fact]
     public async Task CheckoutAsync_WhenOrderFailsValidation_ShouldNeverCallInventorySaveOrNotification()
     {
-        // Arrange: Invalid quantity = 0
+        // Arrange
         var item = CreateItem("Invalid Item", unitPrice: 50m, quantity: 0);
         var order = CreateOrderWithItems(item);
 
@@ -203,9 +201,7 @@ public class CheckoutServiceTests
         _notificationServiceMock.Verify(x => x.SendOrderConfirmationAsync(It.IsAny<CheckoutReceipt>(), It.IsAny<CancellationToken>()), Times.Never);
     }
 
-    #endregion
-
-    #region Helper Methods
+    // ── Helpers ──
 
     private static Order CreateOrderWithItems(params OrderItem[] items)
     {
@@ -228,6 +224,4 @@ public class CheckoutServiceTests
             Quantity = quantity
         };
     }
-
-    #endregion
 }
